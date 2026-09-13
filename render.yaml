@@ -1,9 +1,9 @@
-﻿services:
+services:
   - type: web
     name: home-services-backend
     env: docker
     plan: free
-    dockerCommand: sh -c "mkdir -p database && touch database/database.sqlite && php artisan migrate:fresh --force --seed && php artisan serve --host=0.0.0.0 --port=$PORT"
+    dockerCommand: ./start.sh
     envVars:
       - key: APP_KEY
         generateValue: true
@@ -32,7 +32,7 @@
     name: home-services-reverb
     env: docker
     plan: free
-    dockerCommand: sh -c "php artisan reverb:start --host=0.0.0.0 --port=$PORT"
+    dockerCommand: ./start-reverb.sh
     envVars:
       - key: APP_ENV
         value: production
