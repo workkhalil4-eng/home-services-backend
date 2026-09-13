@@ -22,11 +22,11 @@ services:
       - key: REVERB_APP_SECRET
         value: f4a8b2c1d9e3f7a6b5c4d3e2f1a0b9c8
       - key: REVERB_HOST
-        value: 0.0.0.0
+        value: home-services-reverb.onrender.com
       - key: REVERB_PORT
-        value: 8080
+        value: 443
       - key: REVERB_SCHEME
-        value: http
+        value: https
 
   - type: web
     name: home-services-reverb
