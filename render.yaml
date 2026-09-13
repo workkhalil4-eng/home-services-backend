@@ -1,0 +1,53 @@
+﻿services:
+  - type: web
+    name: home-services-backend
+    env: php
+    plan: free
+    buildCommand: |
+      composer install --no-dev --optimize-autoloader
+    startCommand: |
+      mkdir -p database && touch database/database.sqlite
+      php artisan migrate:fresh --force --seed
+      php artisan config:cache
+      php artisan route:cache
+      php artisan view:cache
+      php artisan serve --host=0.0.0.0 --port=$PORT
+    envVars:
+      - key: APP_KEY
+        generateValue: true
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: DB_CONNECTION
+        value: sqlite
+      - key: CACHE_STORE
+        value: file
+      - key: REVERB_APP_ID
+        value: 829314
+      - key: REVERB_APP_KEY
+        value: 7d8f921e3b6a4c59
+      - key: REVERB_APP_SECRET
+        value: f4a8b2c1d9e3f7a6b5c4d3e2f1a0b9c8
+      - key: REVERB_HOST
+        value: 0.0.0.0
+      - key: REVERB_PORT
+        value: 8080
+      - key: REVERB_SCHEME
+        value: http
+
+  - type: web
+    name: home-services-reverb
+    env: php
+    plan: free
+    buildCommand: composer install --no-dev --optimize-autoloader
+    startCommand: php artisan reverb:start --host=0.0.0.0 --port=$PORT
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: REVERB_APP_ID
+        value: 829314
+      - key: REVERB_APP_KEY
+        value: 7d8f921e3b6a4c59
+      - key: REVERB_APP_SECRET
+        value: f4a8b2c1d9e3f7a6b5c4d3e2f1a0b9c8
