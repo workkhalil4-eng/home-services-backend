@@ -14,6 +14,8 @@ Broadcast::routes(['middleware' => ['auth:sanctum']]);
 Route::middleware('throttle:6,1')->group(function () {
     Route::post('/auth/send-otp', [AuthController::class, 'sendOtp']);
     Route::post('/auth/verify-otp', [AuthController::class, 'verifyOtp']);
+    Route::post('/send-otp', [AuthController::class, 'sendOtp']);
+    Route::post('/verify-otp', [AuthController::class, 'verifyOtp']);
 });
 
 Route::middleware(['auth:sanctum'])->group(function () {
