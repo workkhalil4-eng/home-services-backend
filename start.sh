@@ -1,4 +1,4 @@
-﻿#!/bin/sh
+#!/bin/sh
 # Ensure DB exists
 mkdir -p database
 touch database/database.sqlite

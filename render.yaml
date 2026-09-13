@@ -3,7 +3,7 @@ services:
     name: home-services-backend
     env: docker
     plan: free
-    dockerCommand: ./start.sh
+    dockerCommand: sh ./start.sh
     envVars:
       - key: APP_KEY
         generateValue: true
@@ -32,7 +32,7 @@ services:
     name: home-services-reverb
     env: docker
     plan: free
-    dockerCommand: ./start-reverb.sh
+    dockerCommand: sh ./start-reverb.sh
     envVars:
       - key: APP_ENV
         value: production
