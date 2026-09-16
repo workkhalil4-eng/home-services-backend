@@ -18,14 +18,15 @@ Route::middleware('throttle:6,1')->group(function () {
     Route::post('/verify-otp', [AuthController::class, 'verifyOtp']);
 });
 
+Route::get('/categories', [CustomerController::class, 'getCategories']);
+Route::get('/categories/{category}/services', [CustomerController::class, 'getServices']);
+
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
 
     // Customer Routes
-    Route::get('/categories', [CustomerController::class, 'getCategories']);
-    Route::get('/categories/{category}/services', [CustomerController::class, 'getServices']);
     
     Route::middleware('throttle:10,1')->group(function () {
         Route::post('/service-requests', [CustomerController::class, 'createRequest']);
