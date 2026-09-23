@@ -20,6 +20,39 @@ class CustomerController extends Controller
         return response()->json(Service::where('category_id', $categoryId)->where('is_active', true)->get());
     }
 
+    public function getOrders(Request $request)
+    {
+        $orders = ServiceRequest::with(['service', 'provider'])
+            ->where('customer_id', $request->user()->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+            
+        // Map to return simplified data structure for the app
+        $mapped = $orders->map(function($order) {
+            return [
+                'id' => $order->id,
+                'title' => $order->service->name ?? 'خدمة عامة',
+                'provider' => $order->provider ? ('الفني: ' . $order->provider->name) : 'بانتظار موافقة فني',
+                'date' => $order->created_at->format('Y-m-d H:i'),
+                'price' => $order->total_price ? $order->total_price . ' ر.س' : 'غير محدد',
+                'status_code' => $order->status,
+                'status' => $this->mapStatus($order->status),
+            ];
+        });
+
+        return response()->json($mapped);
+    }
+
+    private function mapStatus($status) {
+        switch($status) {
+            case 'pending': return 'قيد الانتظار';
+            case 'in_progress': return 'قيد المتابعة';
+            case 'completed': return 'مكتمل بنجاح';
+            case 'cancelled': return 'ملغي';
+            default: return 'غير معروف';
+        }
+    }
+
     public function createRequest(Request $request)
     {
         $request->validate([

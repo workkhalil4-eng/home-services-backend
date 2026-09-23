@@ -27,10 +27,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
     });
 
     // Customer Routes
-    
     Route::middleware('throttle:10,1')->group(function () {
         Route::post('/service-requests', [CustomerController::class, 'createRequest']);
     });
+    
+    Route::get('/customer/orders', [CustomerController::class, 'getOrders']);
     
     Route::post('/service-requests/{id}/cancel', [CustomerController::class, 'cancelRequest']);
     Route::get('/service-requests/{id}/track', [CustomerController::class, 'trackRequest']);
