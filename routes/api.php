@@ -37,6 +37,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/reviews', [ReviewController::class, 'store']);
 
     // Provider Routes
+    Route::get('/provider/stats', [ProviderController::class, 'getStats']);
+    Route::get('/provider/requests', [ProviderController::class, 'getRequests']);
     Route::post('/provider/profile', [ProviderController::class, 'updateProfile']);
     Route::middleware('throttle:5,1')->post('/provider/kyc', [ProviderController::class, 'uploadKyc']);
     Route::post('/provider/toggle-availability', [ProviderController::class, 'toggleAvailability']);

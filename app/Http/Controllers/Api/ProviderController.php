@@ -136,4 +136,52 @@ class ProviderController extends Controller
 
         return response()->json(['message' => 'تم إنجاز الخدمة بنجاح.', 'data' => $serviceRequest]);
     }
+
+    public function getStats(Request $request)
+    {
+        $userId = $request->user()->id;
+
+        $completedCount = ServiceRequest::where('provider_id', $userId)
+            ->where('status', 'completed')
+            ->count();
+
+        $today = now()->startOfDay();
+        $earningsToday = ServiceRequest::where('provider_id', $userId)
+            ->where('status', 'completed')
+            ->where('updated_at', '>=', $today)
+            ->sum('total_price');
+
+        $avgRating = \App\Models\Review::where('provider_id', $userId)->avg('rating');
+        $ratingFormatted = $avgRating ? number_format($avgRating, 1) . ' ★' : '0.0 ★';
+
+        return response()->json([
+            'earnings_today' => ($earningsToday > 0 ? number_format($earningsToday, 0) : '0') . ' ر.س',
+            'completed_orders' => $completedCount . ' طلبات',
+            'rating' => $ratingFormatted,
+        ]);
+    }
+
+    public function getRequests(Request $request)
+    {
+        $userId = $request->user()->id;
+
+        $requests = ServiceRequest::with('service', 'customer')
+            ->where('provider_id', $userId)
+            ->whereIn('status', ['accepted', 'in_progress'])
+            ->latest()
+            ->get()
+            ->map(function ($req) {
+                return [
+                    'id' => $req->id,
+                    'service' => $req->service->name ?? 'خدمة منزلية',
+                    'address' => $req->address,
+                    'customer' => $req->customer->name ?? 'زبون',
+                    'price' => ($req->total_price ?? 0) . ' ر.س',
+                    'distance' => 'قريب منك',
+                    'status' => $req->status,
+                ];
+            });
+
+        return response()->json($requests);
+    }
 }

@@ -38,11 +38,14 @@ class NewServiceRequestEvent implements ShouldBroadcastNow
     {
         return [
             'id' => $this->serviceRequest->id,
-            'service' => $this->serviceRequest->service->name,
+            'service' => $this->serviceRequest->service->name ?? 'خدمة منزلية',
             'description' => $this->serviceRequest->description,
             'latitude' => $this->serviceRequest->latitude,
             'longitude' => $this->serviceRequest->longitude,
             'address' => $this->serviceRequest->address,
+            'customer' => $this->serviceRequest->customer->name ?? 'زبون',
+            'price' => ($this->serviceRequest->total_price ?? 0) . ' ر.س',
+            'distance' => 'قريب منك',
         ];
     }
 }
