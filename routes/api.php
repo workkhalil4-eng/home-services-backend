@@ -53,3 +53,4 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/payments/void', [PaymentController::class, 'voidPayment']);
 });
 Route::get('/debug/db', function() { return ['requests' => \App\Models\ServiceRequest::with('service')->get(), 'providers' => \App\Models\ProviderProfile::with('categories', 'user')->get()]; });
+Route::get('/debug/update-distance', function() { \App\Models\ProviderProfile::query()->update(['max_travel_distance' => 20000]); return \App\Models\ProviderProfile::all(); });
