@@ -7,6 +7,7 @@ ENV COMPOSER_MEMORY_LIMIT=-1
 RUN apt-get update && apt-get install -y \
     libsqlite3-dev \
     sqlite3 \
+    libpq-dev \
     unzip \
     curl \
     git \
@@ -16,7 +17,7 @@ RUN apt-get update && apt-get install -y \
     libicu-dev \
     dos2unix \
     && docker-php-ext-configure intl \
-    && docker-php-ext-install pdo_sqlite pcntl sockets zip mbstring xml intl
+    && docker-php-ext-install pdo_sqlite pdo_pgsql pcntl sockets zip mbstring xml intl
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
