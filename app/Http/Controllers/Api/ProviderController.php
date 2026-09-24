@@ -164,24 +164,65 @@ class ProviderController extends Controller
     public function getRequests(Request $request)
     {
         $userId = $request->user()->id;
+        $profile = \App\Models\ProviderProfile::with('categories')->where('user_id', $userId)->first();
+
+        if (!$profile || $profile->kyc_status !== 'approved' || !$profile->is_available) {
+            return response()->json([]);
+        }
+
+        $categoryIds = $profile->categories->pluck('id')->toArray();
+        if (empty($categoryIds)) {
+            return response()->json([]);
+        }
+
+        $lat = $profile->latitude;
+        $lng = $profile->longitude;
+        $maxDistance = $profile->max_travel_distance ?? 50;
 
         $requests = ServiceRequest::with('service', 'customer')
-            ->where('provider_id', $userId)
-            ->whereIn('status', ['accepted', 'in_progress'])
+            ->where('status', 'pending')
+            ->whereNull('provider_id')
+            ->whereHas('service', function($q) use ($categoryIds) {
+                $q->whereIn('category_id', $categoryIds);
+            })
             ->latest()
-            ->get()
-            ->map(function ($req) {
-                return [
+            ->get();
+
+        $filteredRequests = [];
+        foreach ($requests as $req) {
+            if ($lat && $lng && $req->latitude && $req->longitude) {
+                // Calculate distance
+                $earthRadius = 6371;
+                $dLat = deg2rad($req->latitude - $lat);
+                $dLng = deg2rad($req->longitude - $lng);
+                $a = sin($dLat/2) * sin($dLat/2) + cos(deg2rad($lat)) * cos(deg2rad($req->latitude)) * sin($dLng/2) * sin($dLng/2);
+                $c = 2 * atan2(sqrt($a), sqrt(1-$a));
+                $distance = $earthRadius * $c;
+
+                if ($distance <= $maxDistance) {
+                    $filteredRequests[] = [
+                        'id' => $req->id,
+                        'service' => $req->service->name ?? 'خدمة عامة',
+                        'address' => $req->address,
+                        'customer' => $req->customer->name ?? 'زبون',
+                        'price' => ($req->total_price ?? 0) . ' ر.س',
+                        'distance' => number_format($distance, 1) . ' كم',
+                        'status' => $req->status,
+                    ];
+                }
+            } else {
+                $filteredRequests[] = [
                     'id' => $req->id,
-                    'service' => $req->service->name ?? 'خدمة منزلية',
+                    'service' => $req->service->name ?? 'خدمة عامة',
                     'address' => $req->address,
                     'customer' => $req->customer->name ?? 'زبون',
                     'price' => ($req->total_price ?? 0) . ' ر.س',
-                    'distance' => 'قريب منك',
+                    'distance' => 'مسافة غير محددة',
                     'status' => $req->status,
                 ];
-            });
+            }
+        }
 
-        return response()->json($requests);
+        return response()->json($filteredRequests);
     }
 }
