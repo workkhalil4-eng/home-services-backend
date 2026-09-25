@@ -52,5 +52,25 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/payments/capture', [PaymentController::class, 'capturePayment']);
     Route::post('/payments/void', [PaymentController::class, 'voidPayment']);
 });
-Route::get('/debug/db', function() { return ['requests' => \App\Models\ServiceRequest::with('service')->get(), 'providers' => \App\Models\ProviderProfile::with('categories', 'user')->get()]; });
-Route::get('/debug/update-distance', function() { \App\Models\ProviderProfile::query()->update(['max_travel_distance' => 20000]); return \App\Models\ProviderProfile::all(); });
+
+Route::get('/debug/db', function() {
+    return response()->json([
+        'requests' => \App\Models\ServiceRequest::with('service')->get(),
+        'providers' => \App\Models\ProviderProfile::with('categories', 'user')->get(),
+        'categories' => \App\Models\Category::all(),
+    ]);
+});
+
+Route::get('/debug/reseed', function() {
+    try {
+        \Illuminate\Support\Facades\Artisan::call('db:seed', ['--force' => true]);
+        \App\Models\ProviderProfile::query()->update(['max_travel_distance' => 20000]);
+        return response()->json([
+            'status' => 'ok',
+            'categories' => \App\Models\Category::count(),
+            'providers' => \App\Models\ProviderProfile::count(),
+        ]);
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
+});
