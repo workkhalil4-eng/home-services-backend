@@ -9,50 +9,50 @@ use Illuminate\Support\Facades\Cache;
 
 class AuthController extends Controller
 {
-    public function sendOtp(Request \)
+    public function sendOtp(Request $request)
     {
-        \->validate([
+        $request->validate([
             'phone' => 'required|string',
         ]);
 
         // توليد رمز تحقق عشوائي حقيقي من 4 أرقام
-        \ = (string) rand(1000, 9999);
+        $otp = (string) rand(1000, 9999);
 
-        Cache::put('otp_' . \->phone, \, now()->addMinutes(5));
+        Cache::put('otp_' . $request->phone, $otp, now()->addMinutes(5));
 
         return response()->json([
             'message' => 'تم إرسال رمز التحقق',
-            'simulated_otp' => \ // إرجاع الرمز لمحاكاة وصول رسالة SMS في التطبيق
+            'simulated_otp' => $otp // إرجاع الرمز لمحاكاة وصول رسالة SMS في التطبيق
         ]);
     }
 
-    public function verifyOtp(Request \)
+    public function verifyOtp(Request $request)
     {
-        \->validate([
+        $request->validate([
             'phone' => 'required|string',
             'otp' => 'required|string',
         ]);
 
-        \ = Cache::get('otp_' . \->phone);
+        $cachedOtp = Cache::get('otp_' . $request->phone);
 
         // التحقق من أن الرمز مطابق للرمز العشوائي (لا يوجد 1234 بعد الآن)
-        if (\ !== \->otp) {
+        if ($cachedOtp !== $request->otp) {
             return response()->json(['message' => 'رمز التحقق غير صحيح أو منتهي الصلاحية'], 400);
         }
 
-        \ = User::firstOrCreate(
-            ['phone' => \->phone],
-            ['role' => \->role ?? 'customer']
+        $user = User::firstOrCreate(
+            ['phone' => $request->phone],
+            ['role' => $request->role ?? 'customer']
         );
 
-        Cache::forget('otp_' . \->phone);
+        Cache::forget('otp_' . $request->phone);
 
-        \ = \->createToken('auth_token')->plainTextToken;
+        $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
             'message' => 'تم تسجيل الدخول بنجاح',
-            'user' => \,
-            'token' => \
+            'user' => $user,
+            'token' => $token
         ]);
     }
 }

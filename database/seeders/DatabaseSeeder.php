@@ -12,7 +12,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // 1. إنشاء التصنيفات والخدمات (أكثر من 15 خدمة متنوعة)
-        \ = [
+        $categories = [
             ['name' => 'سباكة', 'icon' => 'plumbing', 'description' => 'إصلاح تسريبات، تركيب أدوات صحية، صيانة الأنابيب'],
             ['name' => 'كهرباء', 'icon' => 'electrical', 'description' => 'تمديدات كهربائية، صيانة لوحات، تركيب إضاءة'],
             ['name' => 'تكييف', 'icon' => 'ac', 'description' => 'غسيل مكيفات، تعبئة فريون، صيانة أعطال التبريد'],
@@ -29,12 +29,12 @@ class DatabaseSeeder extends Seeder
             ['name' => 'تلميع سيارات', 'icon' => 'car_wash', 'description' => 'غسيل متنقل، تلميع ساطع، نانو سيراميك'],
         ];
 
-        foreach (\ as \) {
-            Category::firstOrCreate(['name' => \['name']], \);
+        foreach ($categories as $cat) {
+            Category::firstOrCreate(['name' => $cat['name']], $cat);
         }
 
         // 2. إنشاء فنيين محترفين (Demo Providers)
-        \ = [
+        $providers = [
             ['phone' => '0500000001', 'name' => 'أحمد للسباكة المتقدمة', 'category' => 'سباكة'],
             ['phone' => '0500000002', 'name' => 'مؤسسة النور للكهرباء', 'category' => 'كهرباء'],
             ['phone' => '0500000003', 'name' => 'خبراء التكييف المركزي', 'category' => 'تكييف'],
@@ -47,14 +47,14 @@ class DatabaseSeeder extends Seeder
             ['phone' => '0500000010', 'name' => 'الرؤية الذكية للكاميرات', 'category' => 'كاميرات وشبكات'],
         ];
 
-        foreach (\ as \) {
-            \ = Category::where('name', \['category'])->first();
-            if (\) {
+        foreach ($providers as $prov) {
+            $category = Category::where('name', $prov['category'])->first();
+            if ($category) {
                 Provider::firstOrCreate(
-                    ['phone' => \['phone']],
+                    ['phone' => $prov['phone']],
                     [
-                        'name' => \['name'],
-                        'category_id' => \->id,
+                        'name' => $prov['name'],
+                        'category_id' => $category->id,
                         'rating' => rand(40, 50) / 10,
                         'reviews_count' => rand(15, 200),
                         'is_available' => true,
