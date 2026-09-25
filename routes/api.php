@@ -70,13 +70,20 @@ Route::get('/debug/reseed', function() {
         \App\Models\ProviderProfile::query()->update(['max_travel_distance' => 20000]);
         return response()->json([
             'status' => 'ok',
+            'message' => 'تم تهيئة قاعدة البيانات بنجاح لجميع المهن والفنيين',
             'migrate_output' => $migrateOutput,
             'seed_output' => $seedOutput,
-            'categories' => \App\Models\Category::count(),
-            'services' => \App\Models\Service::count(),
-            'providers' => \App\Models\ProviderProfile::count(),
+            'categories_count' => \App\Models\Category::where('is_active', true)->count(),
+            'services_count' => \App\Models\Service::where('is_active', true)->count(),
+            'providers_count' => \App\Models\ProviderProfile::count(),
         ]);
-    } catch (\Exception $e) {
-        return response()->json(['error' => $e->getMessage()], 500);
+    } catch (\Throwable $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+        ], 500);
     }
 });
+
