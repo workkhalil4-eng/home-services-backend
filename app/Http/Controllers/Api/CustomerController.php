@@ -46,10 +46,11 @@ class CustomerController extends Controller
     private function mapStatus($status) {
         switch($status) {
             case 'pending': return 'قيد الانتظار';
-            case 'in_progress': return 'قيد المتابعة';
+            case 'accepted': return 'تم القبول (بانتظار الدفع)';
+            case 'in_progress': return 'قيد التنفيذ';
             case 'completed': return 'مكتمل بنجاح';
             case 'cancelled': return 'ملغي';
-            default: return 'غير معروف';
+            default: return 'قيد المتابعة';
         }
     }
 
@@ -141,30 +142,34 @@ class CustomerController extends Controller
 
     public function trackRequest(Request $request, $id)
     {
-        $serviceRequest = ServiceRequest::with('provider.providerProfile')->findOrFail($id);
+        $serviceRequest = ServiceRequest::with(['service', 'provider.providerProfile'])->findOrFail($id);
 
         if ($serviceRequest->customer_id !== $request->user()->id) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        // Rule: Tracking is strictly visible ONLY when payment is authorized (status = in_progress)
-        if ($serviceRequest->status !== 'in_progress') {
-            return response()->json([
-                'message' => 'Tracking is not available yet. Please authorize payment.',
-                'tracking_visible' => false,
-                'location' => null
-            ], 403);
-        }
-
-        $profile = $serviceRequest->provider->providerProfile;
+        $profile = $serviceRequest->provider?->providerProfile;
+        $isTrackingAvailable = ($serviceRequest->status === 'in_progress');
 
         return response()->json([
-            'message' => 'Tracking active.',
-            'tracking_visible' => true,
-            'location' => [
+            'id' => $serviceRequest->id,
+            'title' => $serviceRequest->service->name ?? 'طلب خدمة',
+            'description' => $serviceRequest->description,
+            'address' => $serviceRequest->address,
+            'total_price' => $serviceRequest->total_price ? $serviceRequest->total_price . ' ر.س' : 'حسب المعاينة',
+            'status_code' => $serviceRequest->status,
+            'status' => $this->mapStatus($serviceRequest->status),
+            'provider' => $serviceRequest->provider ? [
+                'id' => $serviceRequest->provider->id,
+                'name' => $serviceRequest->provider->name,
+                'phone' => $serviceRequest->provider->phone,
+            ] : null,
+            'tracking_visible' => $isTrackingAvailable,
+            'location' => ($isTrackingAvailable && $profile) ? [
                 'latitude' => $profile->latitude,
                 'longitude' => $profile->longitude,
-            ]
+            ] : null,
+            'created_at' => $serviceRequest->created_at->format('Y-m-d H:i'),
         ]);
     }
 }
