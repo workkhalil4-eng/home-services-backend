@@ -13,12 +13,8 @@ services:
         value: false
       - key: DB_CONNECTION
         value: sqlite
-      - key: DATABASE_URL
-        fromDatabase:
-          name: home-services-db
-          property: connectionString
       - key: CACHE_STORE
-        value: database
+        value: file
       - key: REVERB_APP_ID
         value: 829314
       - key: REVERB_APP_KEY
@@ -46,7 +42,3 @@ services:
         value: 7d8f921e3b6a4c59
       - key: REVERB_APP_SECRET
         value: f4a8b2c1d9e3f7a6b5c4d3e2f1a0b9c8
-
-databases:
-  - name: home-services-db
-    plan: free
