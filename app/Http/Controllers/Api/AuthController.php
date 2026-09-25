@@ -1,67 +1,58 @@
-<?php
+﻿<?php
 
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
+use App\Models\User;
 use Illuminate\Support\Facades\Cache;
 
 class AuthController extends Controller
 {
-    public function sendOtp(Request $request)
+    public function sendOtp(Request \)
     {
-        $request->validate([
+        \->validate([
             'phone' => 'required|string',
         ]);
 
-        $otp = '1234';
+        // توليد رمز تحقق عشوائي حقيقي من 4 أرقام
+        \ = (string) rand(1000, 9999);
 
-        Cache::put('otp_' . $request->phone, $otp, now()->addMinutes(5));
+        Cache::put('otp_' . \->phone, \, now()->addMinutes(5));
 
         return response()->json([
-            'message' => app()->environment('production') 
-                ? 'OTP sent successfully' 
-                : 'OTP sent successfully (Use 1234 for testing)',
+            'message' => 'تم إرسال رمز التحقق',
+            'simulated_otp' => \ // إرجاع الرمز لمحاكاة وصول رسالة SMS في التطبيق
         ]);
     }
 
-    public function verifyOtp(Request $request)
+    public function verifyOtp(Request \)
     {
-        $request->validate([
+        \->validate([
             'phone' => 'required|string',
             'otp' => 'required|string',
-            'role' => 'required|in:customer,provider'
         ]);
 
-        $cachedOtp = Cache::get('otp_' . $request->phone);
+        \ = Cache::get('otp_' . \->phone);
 
-        if ($cachedOtp !== $request->otp && $request->otp !== '1234') {
-            return response()->json(['message' => 'Invalid or expired OTP'], 400);
+        // التحقق من أن الرمز مطابق للرمز العشوائي (لا يوجد 1234 بعد الآن)
+        if (\ !== \->otp) {
+            return response()->json(['message' => 'رمز التحقق غير صحيح أو منتهي الصلاحية'], 400);
         }
 
-        $user = User::firstOrCreate(
-            ['phone' => $request->phone],
-            [
-                'name' => 'User ' . substr($request->phone, -4),
-                'password' => Hash::make(str()->random(10)),
-                'is_active' => true,
-                'role' => $request->role, // يتم حفظ هذا فقط عند الإنشاء لأول مرة
-            ]
+        \ = User::firstOrCreate(
+            ['phone' => \->phone],
+            ['role' => \->role ?? 'customer']
         );
 
-        // Assign role if Spatie permissions are set up, but for now we just return token
-        // $user->assignRole($user->role);
+        Cache::forget('otp_' . \->phone);
 
-        $token = $user->createToken($user->role . '-auth-token')->plainTextToken;
-
-        Cache::forget('otp_' . $request->phone);
+        \ = \->createToken('auth_token')->plainTextToken;
 
         return response()->json([
-            'user' => $user,
-            'token' => $token,
-            'role' => $user->role, // إرجاع الدور الفعلي المحفوظ في قاعدة البيانات
+            'message' => 'تم تسجيل الدخول بنجاح',
+            'user' => \,
+            'token' => \
         ]);
     }
 }
