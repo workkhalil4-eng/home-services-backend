@@ -63,11 +63,17 @@ Route::get('/debug/db', function() {
 
 Route::get('/debug/reseed', function() {
     try {
+        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+        $migrateOutput = \Illuminate\Support\Facades\Artisan::output();
         \Illuminate\Support\Facades\Artisan::call('db:seed', ['--force' => true]);
+        $seedOutput = \Illuminate\Support\Facades\Artisan::output();
         \App\Models\ProviderProfile::query()->update(['max_travel_distance' => 20000]);
         return response()->json([
             'status' => 'ok',
+            'migrate_output' => $migrateOutput,
+            'seed_output' => $seedOutput,
             'categories' => \App\Models\Category::count(),
+            'services' => \App\Models\Service::count(),
             'providers' => \App\Models\ProviderProfile::count(),
         ]);
     } catch (\Exception $e) {
