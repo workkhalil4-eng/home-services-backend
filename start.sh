@@ -1,14 +1,9 @@
 #!/bin/sh
 
-# If DATABASE_URL is set, parse it for PostgreSQL
+# If DATABASE_URL is set, let Laravel handle it natively
 if [ -n "$DATABASE_URL" ]; then
     export DB_CONNECTION=pgsql
-    export DB_HOST=$(echo $DATABASE_URL | sed -e 's|.*@\(.*\):.*|\1|')
-    export DB_PORT=$(echo $DATABASE_URL | sed -e 's|.*:\([0-9]*\)/.*|\1|')
-    export DB_DATABASE=$(echo $DATABASE_URL | sed -e 's|.*/\(.*\)$|\1|')
-    export DB_USERNAME=$(echo $DATABASE_URL | sed -e 's|.*://\(.*\):.*@.*|\1|')
-    export DB_PASSWORD=$(echo $DATABASE_URL | sed -e 's|.*://[^:]*:\(.*\)@.*|\1|')
-    echo "Using PostgreSQL: $DB_HOST/$DB_DATABASE"
+    echo "Using PostgreSQL via DATABASE_URL"
 else
     # Fallback to SQLite
     export DB_CONNECTION=sqlite
