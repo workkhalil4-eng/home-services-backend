@@ -1,217 +1,71 @@
-<?php
+﻿<?php
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use App\Models\Category;
-use App\Models\Service;
-use App\Models\ProviderProfile;
 use Illuminate\Database\Seeder;
+use App\Models\Category;
+use App\Models\Provider;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\DB;
 
 class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. Plumbing (سباكة)
-        $plumbingCategory = Category::firstOrCreate(
-            ['name' => 'سباكة'],
-            [
-                'icon' => 'plumbing',
-                'description' => 'خدمات السباكة المنزلية وتسريب المياه',
-                'is_active' => true,
-            ]
-        );
+        // 1. إنشاء التصنيفات والخدمات (أكثر من 15 خدمة متنوعة)
+        \ = [
+            ['name' => 'سباكة', 'icon' => 'plumbing', 'description' => 'إصلاح تسريبات، تركيب أدوات صحية، صيانة الأنابيب'],
+            ['name' => 'كهرباء', 'icon' => 'electrical', 'description' => 'تمديدات كهربائية، صيانة لوحات، تركيب إضاءة'],
+            ['name' => 'تكييف', 'icon' => 'ac', 'description' => 'غسيل مكيفات، تعبئة فريون، صيانة أعطال التبريد'],
+            ['name' => 'دهان', 'icon' => 'painting', 'description' => 'دهان داخلي وخارجي، معالجة رطوبة، تركيب ورق جدران'],
+            ['name' => 'تنظيف', 'icon' => 'cleaning', 'description' => 'تنظيف منازل، غسيل سجاد، تنظيف واجهات'],
+            ['name' => 'نجارة', 'icon' => 'carpentry', 'description' => 'صيانة أبواب، تركيب أثاث، تفصيل خزائن'],
+            ['name' => 'مكافحة حشرات', 'icon' => 'pest_control', 'description' => 'رش مبيدات، مكافحة قوارض، تعقيم'],
+            ['name' => 'صيانة أجهزة', 'icon' => 'appliances', 'description' => 'تصليح غسالات، ثلاجات، أفران، مايكروويف'],
+            ['name' => 'نقل عفش', 'icon' => 'moving', 'description' => 'فك وتركيب، تغليف، نقل سيارات مجهزة'],
+            ['name' => 'كاميرات وشبكات', 'icon' => 'cctv', 'description' => 'تركيب كاميرات مراقبة، شبكات إنترنت، سنترال'],
+            ['name' => 'تصميم حدائق', 'icon' => 'landscaping', 'description' => 'تنسيق حدائق، تركيب عشب صناعي، شبكات ري'],
+            ['name' => 'جبس وديكور', 'icon' => 'gypsum', 'description' => 'تركيب جبس بورد، أسقف معلقة، ديكورات إضاءة'],
+            ['name' => 'زجاج وألومنيوم', 'icon' => 'glass', 'description' => 'تفصيل شبابيك ألومنيوم، كبائن شاور، واجهات زجاجية'],
+            ['name' => 'تلميع سيارات', 'icon' => 'car_wash', 'description' => 'غسيل متنقل، تلميع ساطع، نانو سيراميك'],
+        ];
 
-        Service::firstOrCreate(
-            ['name' => 'إصلاح تسريب مياه', 'category_id' => $plumbingCategory->id],
-            [
-                'base_price' => 50.00,
-                'is_fixed_price' => true,
-                'description' => 'إصلاح تسريبات الأنابيب والصنابير والخلاطات',
-                'is_active' => true,
-            ]
-        );
+        foreach (\ as \) {
+            Category::firstOrCreate(['name' => \['name']], \);
+        }
 
-        $plumbingProvider = User::firstOrCreate(
-            ['phone' => '0500000001'],
-            [
-                'name' => 'فني سباكة ديمو',
-                'email' => 'plumber@demo.com',
-                'password' => Hash::make('password'),
-                'role' => 'provider',
-                'is_active' => true,
-            ]
-        );
+        // 2. إنشاء فنيين محترفين (Demo Providers)
+        \ = [
+            ['phone' => '0500000001', 'name' => 'أحمد للسباكة المتقدمة', 'category' => 'سباكة'],
+            ['phone' => '0500000002', 'name' => 'مؤسسة النور للكهرباء', 'category' => 'كهرباء'],
+            ['phone' => '0500000003', 'name' => 'خبراء التكييف المركزي', 'category' => 'تكييف'],
+            ['phone' => '0500000004', 'name' => 'لمسة إبداع للدهانات', 'category' => 'دهان'],
+            ['phone' => '0500000005', 'name' => 'النظافة الماسية', 'category' => 'تنظيف'],
+            ['phone' => '0500000006', 'name' => 'ورشة الأخشاب الفاخرة', 'category' => 'نجارة'],
+            ['phone' => '0500000007', 'name' => 'الدرع لمكافحة الحشرات', 'category' => 'مكافحة حشرات'],
+            ['phone' => '0500000008', 'name' => 'المهندس لصيانة الأجهزة', 'category' => 'صيانة أجهزة'],
+            ['phone' => '0500000009', 'name' => 'السريع لنقل العفش', 'category' => 'نقل عفش'],
+            ['phone' => '0500000010', 'name' => 'الرؤية الذكية للكاميرات', 'category' => 'كاميرات وشبكات'],
+        ];
 
-        $plumbingProfile = ProviderProfile::firstOrCreate(
-            ['user_id' => $plumbingProvider->id],
-            [
-                'is_available' => true,
-                'kyc_status' => 'approved',
-                'max_travel_distance' => 20000,
-                'latitude' => 24.7136,
-                'longitude' => 46.6753,
-            ]
-        );
-
-        DB::table('category_provider_profile')->updateOrInsert(
-            ['category_id' => $plumbingCategory->id, 'provider_profile_id' => $plumbingProfile->id],
-            []
-        );
-
-        // 2. Electrical (كهرباء)
-        $electricCategory = Category::firstOrCreate(
-            ['name' => 'كهرباء'],
-            [
-                'icon' => 'electrical',
-                'description' => 'إصلاح الأعطال الكهربائية وتمديدات الإنارة',
-                'is_active' => true,
-            ]
-        );
-
-        Service::firstOrCreate(
-            ['name' => 'إصلاح أعطال كهربائية', 'category_id' => $electricCategory->id],
-            [
-                'base_price' => 60.00,
-                'is_fixed_price' => true,
-                'description' => 'فحص القواطع وتمديد وصيانة الأفياش والإنارة',
-                'is_active' => true,
-            ]
-        );
-
-        $electricProvider = User::firstOrCreate(
-            ['phone' => '0500000003'],
-            [
-                'name' => 'فني كهرباء ديمو',
-                'email' => 'electrician@demo.com',
-                'password' => Hash::make('password'),
-                'role' => 'provider',
-                'is_active' => true,
-            ]
-        );
-
-        $electricProfile = ProviderProfile::firstOrCreate(
-            ['user_id' => $electricProvider->id],
-            [
-                'is_available' => true,
-                'kyc_status' => 'approved',
-                'max_travel_distance' => 20000,
-                'latitude' => 24.7136,
-                'longitude' => 46.6753,
-            ]
-        );
-
-        DB::table('category_provider_profile')->updateOrInsert(
-            ['category_id' => $electricCategory->id, 'provider_profile_id' => $electricProfile->id],
-            []
-        );
-
-        // 3. Air Conditioning (تكييف)
-        $acCategory = Category::firstOrCreate(
-            ['name' => 'تكييف'],
-            [
-                'icon' => 'ac',
-                'description' => 'صيانة وتنظيف مكيفات سبليت وشباك',
-                'is_active' => true,
-            ]
-        );
-
-        Service::firstOrCreate(
-            ['name' => 'صيانة وتنظيف مكيف', 'category_id' => $acCategory->id],
-            [
-                'base_price' => 80.00,
-                'is_fixed_price' => true,
-                'description' => 'تنظيف فلاتر، شحن فريون، وصيانة وحدات التبريد',
-                'is_active' => true,
-            ]
-        );
-
-        $acProvider = User::firstOrCreate(
-            ['phone' => '0500000004'],
-            [
-                'name' => 'فني تكييف ديمو',
-                'email' => 'ac@demo.com',
-                'password' => Hash::make('password'),
-                'role' => 'provider',
-                'is_active' => true,
-            ]
-        );
-
-        $acProfile = ProviderProfile::firstOrCreate(
-            ['user_id' => $acProvider->id],
-            [
-                'is_available' => true,
-                'kyc_status' => 'approved',
-                'max_travel_distance' => 20000,
-                'latitude' => 24.7136,
-                'longitude' => 46.6753,
-            ]
-        );
-
-        DB::table('category_provider_profile')->updateOrInsert(
-            ['category_id' => $acCategory->id, 'provider_profile_id' => $acProfile->id],
-            []
-        );
-
-        // 4. Painting (دهان)
-        $paintCategory = Category::firstOrCreate(
-            ['name' => 'دهان'],
-            [
-                'icon' => 'painting',
-                'description' => 'دهان وترميم الجدران الداخلية والخارجية',
-                'is_active' => true,
-            ]
-        );
-
-        Service::firstOrCreate(
-            ['name' => 'دهان الجدران والترميم', 'category_id' => $paintCategory->id],
-            [
-                'base_price' => 120.00,
-                'is_fixed_price' => false,
-                'description' => 'طلاء غرف، معالجة الرطوبة والتشققات وتجديد الألوان',
-                'is_active' => true,
-            ]
-        );
-
-        $paintProvider = User::firstOrCreate(
-            ['phone' => '0500000005'],
-            [
-                'name' => 'فني دهان ديمو',
-                'email' => 'painter@demo.com',
-                'password' => Hash::make('password'),
-                'role' => 'provider',
-                'is_active' => true,
-            ]
-        );
-
-        $paintProfile = ProviderProfile::firstOrCreate(
-            ['user_id' => $paintProvider->id],
-            [
-                'is_available' => true,
-                'kyc_status' => 'approved',
-                'max_travel_distance' => 20000,
-                'latitude' => 24.7136,
-                'longitude' => 46.6753,
-            ]
-        );
-
-        DB::table('category_provider_profile')->updateOrInsert(
-            ['category_id' => $paintCategory->id, 'provider_profile_id' => $paintProfile->id],
-            []
-        );
-
-        // 5. Demo Customer User
-        User::firstOrCreate(
-            ['phone' => '0500000002'],
-            [
-                'name' => 'زبون ديمو',
-                'email' => 'customer@demo.com',
-                'password' => Hash::make('password'),
-                'role' => 'customer',
-                'is_active' => true,
-            ]
-        );
+        foreach (\ as \) {
+            \ = Category::where('name', \['category'])->first();
+            if (\) {
+                Provider::firstOrCreate(
+                    ['phone' => \['phone']],
+                    [
+                        'name' => \['name'],
+                        'category_id' => \->id,
+                        'rating' => rand(40, 50) / 10,
+                        'reviews_count' => rand(15, 200),
+                        'is_available' => true,
+                        // جعل النطاق عالمي دائمًا للديمو
+                        'max_travel_distance' => 20000,
+                        'base_location_lat' => 24.7136,
+                        'base_location_lng' => 46.6753,
+                        'hourly_rate' => rand(50, 150),
+                    ]
+                );
+            }
+        }
     }
 }
