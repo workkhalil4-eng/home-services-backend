@@ -11,11 +11,13 @@ use App\Http\Controllers\Api\ReviewController;
 
 Broadcast::routes(['middleware' => ['auth:sanctum']]);
 
-Route::middleware('throttle:6,1')->group(function () {
+Route::middleware('throttle:60,1')->group(function () {
     Route::post('/auth/send-otp', [AuthController::class, 'sendOtp']);
     Route::post('/auth/verify-otp', [AuthController::class, 'verifyOtp']);
     Route::post('/send-otp', [AuthController::class, 'sendOtp']);
     Route::post('/verify-otp', [AuthController::class, 'verifyOtp']);
+    Route::post('/auth/customer/login', [AuthController::class, 'sendOtp']);
+    Route::post('/auth/customer/verify', [AuthController::class, 'verifyOtp']);
 });
 
 Route::get('/categories', [CustomerController::class, 'getCategories']);
