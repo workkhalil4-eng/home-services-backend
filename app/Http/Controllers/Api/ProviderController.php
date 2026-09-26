@@ -155,7 +155,7 @@ class ProviderController extends Controller
         $ratingFormatted = $avgRating ? number_format($avgRating, 1) . ' ★' : '0.0 ★';
 
         return response()->json([
-            'earnings_today' => ($earningsToday > 0 ? number_format($earningsToday, 0) : '0') . ' ر.س',
+            'earnings_today' => ($earningsToday > 0 ? number_format($earningsToday, 0) : '0') . ' د.ج',
             'completed_orders' => $completedCount . ' طلبات',
             'rating' => $ratingFormatted,
         ]);
@@ -205,7 +205,7 @@ class ProviderController extends Controller
                         'service' => $req->service->name ?? 'خدمة عامة',
                         'address' => $req->address,
                         'customer' => $req->customer->name ?? 'زبون',
-                        'price' => ($req->total_price ?? 0) . ' ر.س',
+                        'price' => ($req->total_price ?? 0) . ' د.ج',
                         'distance' => number_format($distance, 1) . ' كم',
                         'status' => $req->status,
                     ];
@@ -216,7 +216,7 @@ class ProviderController extends Controller
                     'service' => $req->service->name ?? 'خدمة عامة',
                     'address' => $req->address,
                     'customer' => $req->customer->name ?? 'زبون',
-                    'price' => ($req->total_price ?? 0) . ' ر.س',
+                    'price' => ($req->total_price ?? 0) . ' د.ج',
                     'distance' => 'مسافة غير محددة',
                     'status' => $req->status,
                 ];

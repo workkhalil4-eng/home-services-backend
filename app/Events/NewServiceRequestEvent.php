@@ -44,7 +44,7 @@ class NewServiceRequestEvent implements ShouldBroadcastNow
             'longitude' => $this->serviceRequest->longitude,
             'address' => $this->serviceRequest->address,
             'customer' => $this->serviceRequest->customer->name ?? 'زبون',
-            'price' => ($this->serviceRequest->total_price ?? 0) . ' ر.س',
+            'price' => ($this->serviceRequest->total_price ?? 0) . ' د.ج',
             'distance' => 'قريب منك',
         ];
     }

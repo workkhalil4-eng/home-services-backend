@@ -34,7 +34,7 @@ class CustomerController extends Controller
                 'title' => $order->service->name ?? 'خدمة عامة',
                 'provider' => $order->provider ? ('الفني: ' . $order->provider->name) : 'بانتظار موافقة فني',
                 'date' => $order->created_at->format('Y-m-d H:i'),
-                'price' => $order->total_price ? $order->total_price . ' ر.س' : 'غير محدد',
+                'price' => $order->total_price ? $order->total_price . ' د.ج' : 'غير محدد',
                 'status_code' => $order->status,
                 'status' => $this->mapStatus($order->status),
             ];
@@ -156,7 +156,7 @@ class CustomerController extends Controller
             'title' => $serviceRequest->service->name ?? 'طلب خدمة',
             'description' => $serviceRequest->description,
             'address' => $serviceRequest->address,
-            'total_price' => $serviceRequest->total_price ? $serviceRequest->total_price . ' ر.س' : 'حسب المعاينة',
+            'total_price' => $serviceRequest->total_price ? $serviceRequest->total_price . ' د.ج' : 'حسب المعاينة',
             'status_code' => $serviceRequest->status,
             'status' => $this->mapStatus($serviceRequest->status),
             'provider' => $serviceRequest->provider ? [
