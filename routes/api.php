@@ -56,8 +56,4 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/payments/void', [PaymentController::class, 'voidPayment']);
 });
 
-Route::get('/temp-hidden-reseed-12345', function() {
-    \Illuminate\Support\Facades\Artisan::call('migrate:fresh', ['--force' => true]);
-    \Illuminate\Support\Facades\Artisan::call('db:seed', ['--force' => true]);
-    return "OK";
-});
+
