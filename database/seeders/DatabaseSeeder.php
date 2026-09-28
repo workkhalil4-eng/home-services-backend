@@ -48,9 +48,7 @@ class DatabaseSeeder extends Seeder
             'max_travel_distance' => 20000,
             'latitude' => 36.7538,
             'longitude' => 3.0588,
-            'rating' => 4.8,
-            'reviews_count' => 15,
-        ]);
+            ]);
 
         DB::table('category_provider_profile')->insert([
             'category_id' => $plumbingCategory->id,
@@ -90,9 +88,7 @@ class DatabaseSeeder extends Seeder
             'max_travel_distance' => 20000,
             'latitude' => 36.7538,
             'longitude' => 3.0588,
-            'rating' => 4.9,
-            'reviews_count' => 30,
-        ]);
+            ]);
 
         DB::table('category_provider_profile')->insert([
             'category_id' => $electricCategory->id,
@@ -132,9 +128,7 @@ class DatabaseSeeder extends Seeder
             'max_travel_distance' => 20000,
             'latitude' => 36.7538,
             'longitude' => 3.0588,
-            'rating' => 4.7,
-            'reviews_count' => 22,
-        ]);
+            ]);
 
         DB::table('category_provider_profile')->insert([
             'category_id' => $acCategory->id,
@@ -174,9 +168,7 @@ class DatabaseSeeder extends Seeder
             'max_travel_distance' => 20000,
             'latitude' => 36.7538,
             'longitude' => 3.0588,
-            'rating' => 5.0,
-            'reviews_count' => 8,
-        ]);
+            ]);
 
         DB::table('category_provider_profile')->insert([
             'category_id' => $paintCategory->id,
