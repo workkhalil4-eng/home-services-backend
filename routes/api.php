@@ -20,6 +20,7 @@ Route::middleware('throttle:60,1')->group(function () {
     Route::post('/auth/customer/verify', [AuthController::class, 'verifyOtp']);
 });
 
+Route::get('/top-providers', [CustomerController::class, 'getTopProviders']);
 Route::get('/categories', [CustomerController::class, 'getCategories']);
 Route::get('/categories/{category}/services', [CustomerController::class, 'getServices']);
 
@@ -55,37 +56,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/payments/void', [PaymentController::class, 'voidPayment']);
 });
 
-Route::get('/debug/db', function() {
-    return response()->json([
-        'requests' => \App\Models\ServiceRequest::with('service')->get(),
-        'providers' => \App\Models\ProviderProfile::with('categories', 'user')->get(),
-        'categories' => \App\Models\Category::all(),
-    ]);
-});
 
-Route::get('/debug/reseed', function() {
-    try {
-        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
-        $migrateOutput = \Illuminate\Support\Facades\Artisan::output();
-        \Illuminate\Support\Facades\Artisan::call('db:seed', ['--force' => true]);
-        $seedOutput = \Illuminate\Support\Facades\Artisan::output();
-        \App\Models\ProviderProfile::query()->update(['max_travel_distance' => 20000]);
-        return response()->json([
-            'status' => 'ok',
-            'message' => 'تم تهيئة قاعدة البيانات بنجاح لجميع المهن والفنيين',
-            'migrate_output' => $migrateOutput,
-            'seed_output' => $seedOutput,
-            'categories_count' => \App\Models\Category::where('is_active', true)->count(),
-            'services_count' => \App\Models\Service::where('is_active', true)->count(),
-            'providers_count' => \App\Models\ProviderProfile::count(),
-        ]);
-    } catch (\Throwable $e) {
-        return response()->json([
-            'status' => 'error',
-            'message' => $e->getMessage(),
-            'file' => $e->getFile(),
-            'line' => $e->getLine(),
-        ], 500);
-    }
-});
+
+
 

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Service;
 use App\Models\ServiceRequest;
+use App\Models\ProviderProfile;
 use Illuminate\Http\Request;
 
 class CustomerController extends Controller
@@ -20,6 +21,34 @@ class CustomerController extends Controller
         return response()->json(Service::where('category_id', $categoryId)->where('is_active', true)->get());
     }
 
+    public function getTopProviders()
+    {
+        $providers = ProviderProfile::with(['user', 'categories'])
+            ->where('kyc_status', 'approved')
+            ->where('is_available', true)
+            ->take(4)
+            ->get();
+
+        $mapped = $providers->map(function($profile) {
+            $category = $profile->categories->first();
+            return [
+                'id' => $profile->user_id,
+                'name' => $profile->user->name ?? 'فني محترف',
+                'profession' => $category ? $category->name : 'صيانة',
+                'category' => $category ? $category->name : 'صيانة عامة',
+                'category_id' => $category ? $category->id : 1,
+                'rating' => $profile->rating ?? 0.0,
+                'reviews_count' => $profile->reviews_count ?? 0,
+                'location' => 'الجزائر',
+                'starting_price' => '1,200 د.ج',
+                'image' => $profile->user->avatar ?? 'https://images.unsplash.com/photo-1585704032915-c3400ca199e7?w=400&auto=format&fit=crop&q=80',
+                'description' => $profile->bio ?? 'فني محترف ومعتمد.'
+            ];
+        });
+
+        return response()->json($mapped);
+    }
+
     public function getOrders(Request $request)
     {
         $orders = ServiceRequest::with(['service', 'provider'])
@@ -32,7 +61,7 @@ class CustomerController extends Controller
             return [
                 'id' => $order->id,
                 'title' => $order->service->name ?? 'خدمة عامة',
-                'provider' => $order->provider ? ('الفني: ' . $order->provider->name) : 'بانتظار موافقة فني',
+                'provider' => $order->provider ? ('الفني: ' . $order->provider->name) : 'لم يتم تعيين فني بعد',
                 'date' => $order->created_at->format('Y-m-d H:i'),
                 'price' => $order->total_price ? $order->total_price . ' د.ج' : 'غير محدد',
                 'status_code' => $order->status,
@@ -46,11 +75,11 @@ class CustomerController extends Controller
     private function mapStatus($status) {
         switch($status) {
             case 'pending': return 'قيد الانتظار';
-            case 'accepted': return 'تم القبول (بانتظار الدفع)';
+            case 'accepted': return 'تم القبول (في الطريق)';
             case 'in_progress': return 'قيد التنفيذ';
             case 'completed': return 'مكتمل بنجاح';
-            case 'cancelled': return 'ملغي';
-            default: return 'قيد المتابعة';
+            case 'cancelled': return 'ملغى';
+            default: return 'قيد المراجعة';
         }
     }
 
@@ -95,7 +124,7 @@ class CustomerController extends Controller
         }
 
         if (empty($matchingProviders)) {
-            return response()->json(['message' => 'عذراً، لا يوجد فنيون متاحون في منطقتك حالياً'], 404);
+            return response()->json(['message' => 'عذراً لا يوجد فنيون متاحون في منطقتك حالياً'], 404);
         }
 
         $serviceRequest = ServiceRequest::create([
@@ -116,7 +145,8 @@ class CustomerController extends Controller
 
         return response()->json([
             'message' => 'Service request created successfully',
-            'data' => $serviceRequest
+            'data' => $serviceRequest,
+            'id' => $serviceRequest->id,
         ], 201);
     }
 
@@ -153,16 +183,19 @@ class CustomerController extends Controller
 
         return response()->json([
             'id' => $serviceRequest->id,
-            'title' => $serviceRequest->service->name ?? 'طلب خدمة',
+            'title' => $serviceRequest->service->name ?? 'خدمة صيانة',
             'description' => $serviceRequest->description,
             'address' => $serviceRequest->address,
-            'total_price' => $serviceRequest->total_price ? $serviceRequest->total_price . ' د.ج' : 'حسب المعاينة',
+            'total_price' => $serviceRequest->total_price ? $serviceRequest->total_price . ' د.ج' : 'غير محدد بعد',
             'status_code' => $serviceRequest->status,
             'status' => $this->mapStatus($serviceRequest->status),
+            'date' => $serviceRequest->created_at->format('Y-m-d H:i'),
             'provider' => $serviceRequest->provider ? [
                 'id' => $serviceRequest->provider->id,
                 'name' => $serviceRequest->provider->name,
                 'phone' => $serviceRequest->provider->phone,
+                'rating' => $profile ? $profile->rating : 0.0,
+                'reviews_count' => $profile ? $profile->reviews_count : 0,
             ] : null,
             'tracking_visible' => $isTrackingAvailable,
             'location' => ($isTrackingAvailable && $profile) ? [
